@@ -1,7 +1,6 @@
 #ifndef EXAM_LIST_LIST_HPP
 #define EXAM_LIST_LIST_HPP
 
-#include <bits/stl_iterator_base_types.h>
 #include <iterator>
 
 template<typename T>
@@ -189,7 +188,7 @@ public:
     list(const list& that) {
         for (auto that_val : that) {
             try {
-                push_back(that_val);
+                insert(end(), that_val);
             } catch (...) {
                 clear();
                 throw std::exception();
@@ -197,12 +196,15 @@ public:
         }
     }
 
-    ~list() {
+    ~list() noexcept {
         clear();
     }
 
     list& operator=(const list& that) {
-        list tmp(that);
+        list tmp;
+        for (auto that_val : that) {
+            tmp.push_back(that_val);
+        }
         swap(*this, tmp);
         return *this;
     }
@@ -215,41 +217,41 @@ public:
         insert(begin(), val);
     }
 
-    void pop_back() {
+    void pop_back() noexcept {
         erase(--end());
     }
 
-    void pop_front() {
+    void pop_front() noexcept {
         erase(begin());
     }
 
-    T& front() {
+    T& front() noexcept {
         return *begin();
     }
 
-    T& back() {
+    T& back() noexcept {
         return *(--end());
     }
 
-    const T& front() const {
+    const T& front() const noexcept {
         return *cbegin();
     }
 
-    const T& back() const {
+    const T& back() const noexcept {
         return *(--cend());
     }
 
-    bool empty() const {
+    bool empty() const noexcept {
         return begin() == end();
     }
 
-    void clear() {
-        while (begin() != end()) {
+    void clear() noexcept {
+        while (!empty()) {
             erase(begin());
         }
     }
 
-    void splice(const_iterator pos, list& other, const_iterator first, const_iterator last) {
+    void splice(const_iterator pos, list& other, const_iterator first, const_iterator last) noexcept {
         if (first == last) {
             return;
         }
@@ -275,7 +277,7 @@ public:
         return iterator(tmp);
     }
 
-    iterator erase(const_iterator pos) {
+    iterator erase(const_iterator pos) noexcept {
         const_iterator prev = pos;
         --prev;
         const_iterator next = pos;
